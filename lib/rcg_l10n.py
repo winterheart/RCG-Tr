@@ -5,6 +5,7 @@
 from datetime import datetime
 from enum import Enum
 from itertools import zip_longest
+import logging
 from os import makedirs
 from os.path import join, exists
 from polib import POEntry, POFile, pofile, unescape
@@ -77,7 +78,7 @@ class RcgTranslation:
         :param json_root_key: JSON key from RcgJsonKeys class
         :return:
         """
-        pot = POFile()
+        pot = POFile(check_for_duplicates=True)
         pot.metadata = {
             'Project-Id-Version': '1.0',
             'Report-Msgid-Bugs-To': 'you@example.com',
@@ -96,7 +97,11 @@ class RcgTranslation:
                     msgctxt=entry[RcgLanguages.LANG_KEY.value["key"]],
                     msgid=entry[RcgLanguages.LANG_ENGLISH.value["key"]],
                 )
-                pot.append(po_entry)
+                try:
+                    pot.append(po_entry)
+                except ValueError:
+                    logging.warning("Entry {} already exists, skipping...".
+                                    format(entry[RcgLanguages.LANG_KEY.value["key"]]))
 
         if not exists(path):
             makedirs(path)
@@ -114,8 +119,7 @@ class RcgTranslation:
         """
 
         if len(self.json_content[json_root_key.value]) == 0:
-            print("WARNING: {} JSON entry is empty! Forgot ot load_json()?"
-                  .format(json_root_key.value))
+            logging.error("WARNING: {} JSON entry is empty! Forgot ot load_json()?".format(json_root_key.value))
             return
 
         temp_json = OrderedDict([])
@@ -184,12 +188,12 @@ class RcgTranslation:
             makedirs(save_path)
         if exists(save_file):
             if overwrite:
-                print("WARNING! File \"{}\" already exists, but overwrite is enabled! Overwriting file!"
-                      .format(save_file))
+                logging.warning("File \"{}\" already exists, but overwrite is enabled! Overwriting file!"
+                                .format(save_file))
                 po.save(join(path, lang, json_root_key.value + ".po"))
             else:
-                print("WARNING! File \"{}\" already exists! Will not saving!"
-                      .format(save_file))
+                logging.error("File \"{}\" already exists! Will not saving!"
+                              .format(save_file))
 
         return
 
