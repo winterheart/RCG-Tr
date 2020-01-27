@@ -28,7 +28,6 @@ class RcgJsonKeys(Enum):
 
 
 class RcgLanguages(Enum):
-    LANG_KEY = {"key": "Key", "iso_code": ""}
     LANG_ENGLISH = {"key": "English", "iso_code": "en"}
     LANG_FRENCH = {"key": "French", "iso_code": "fr"}
     LANG_GERMAN = {"key": "German", "iso_code": "de"}
@@ -41,7 +40,9 @@ class RcgLanguages(Enum):
     LANG_RUSSIAN = {"key": "Russian", "iso_code": "ru"}
 
 
-metadata_entry = {
+LANG_KEY = "Key"
+
+METADATA_ENTRY = {
     'Project-Id-Version': '1.0',
     'Report-Msgid-Bugs-To': 'you@example.com',
     'POT-Creation-Date': datetime.now().isoformat(" "),
@@ -80,20 +81,20 @@ class RcgTranslation:
         :return: POT file object
         """
         pot = POFile(check_for_duplicates=True)
-        pot.metadata = metadata_entry
+        pot.metadata = METADATA_ENTRY
         pot.metadata_is_fuzzy = 1
 
         for entry in self.json_content[json_root_key.value]:
             if entry[RcgLanguages.LANG_ENGLISH.value["key"]] != "":
                 po_entry = POEntry(
-                    msgctxt=entry[RcgLanguages.LANG_KEY.value["key"]],
+                    msgctxt=entry[LANG_KEY],
                     msgid=entry[RcgLanguages.LANG_ENGLISH.value["key"]],
                 )
                 try:
                     pot.append(po_entry)
                 except ValueError:
-                    logging.warning("Entry {} already exists, skipping...".
-                                    format(entry[RcgLanguages.LANG_KEY.value["key"]]))
+                    logging.debug("Entry {} already exists, skipping...".
+                                  format(entry[LANG_KEY]))
 
         return pot
 
@@ -121,7 +122,7 @@ class RcgTranslation:
         """
 
         if len(self.json_content[json_root_key.value]) == 0:
-            logging.error("WARNING: {} JSON entry is empty! Forgot ot load_json()?".format(json_root_key.value))
+            logging.error("ERROR: {} JSON entry is empty! Forgot ot load_json()?".format(json_root_key.value))
             return
 
         temp_json = OrderedDict([])
@@ -134,7 +135,7 @@ class RcgTranslation:
 
         for entry in valid_entries:
             temp_json[json_root_key.value].append({
-                RcgLanguages.LANG_KEY.value["key"]: entry.msgctxt,
+                LANG_KEY: entry.msgctxt,
                 language.value["key"]: entry.msgstr
             })
 
@@ -144,47 +145,49 @@ class RcgTranslation:
 
         return
 
-    def save_po(self, path, json_root_key, lang, fuzzy=True, overwrite=False):
+    def save_po(self, path, json_root_key, lang):
         """
         Save Gettext PO file into directory structure as "path/lang/json_root_key.po"
-
-        WARNING: Do not use method twice, PO files will not be updated, they will be recreated!
-        Any changes between calls will be lost! Function has safeguard parameter overwrite which
-        will not allow overwrite file if it already exists.
+        If "path/lang/json_root_key.po" already exists, it will be updated accordingly to JSON dict
         :param path: Root directory where place to files
         :param json_root_key: JSON key from RcgJsonKeys class
         :param lang: Language to translate. Should be in RcgLanguages class
-        :param fuzzy: Make translated entries fuzzy (default is True)
-        :param overwrite: Force overwrite file even if it exists
         :return:
         """
-        po = POFile()
-        po.metadata = metadata_entry
-
         language = next(name for name in RcgLanguages if name.value["iso_code"] == lang)
-
-        for entry in self.json_content[json_root_key.value]:
-            if entry[RcgLanguages.LANG_ENGLISH.value["key"]] != "":
-                po_entry = POEntry(
-                    msgctxt=entry[RcgLanguages.LANG_KEY.value["key"]],
-                    msgid=entry[RcgLanguages.LANG_ENGLISH.value["key"]],
-                    msgstr=entry[language.value["key"]],
-                )
-                if fuzzy and "fuzzy" not in po_entry.flags:
-                    po_entry.flags.append("fuzzy")
-                po.append(po_entry)
-
         save_path = join(path, lang)
         save_file = join(save_path, json_root_key.value + ".po")
+
         if not exists(save_path):
             makedirs(save_path)
         if exists(save_file):
-            if overwrite:
-                logging.warning("File \"{}\" already exists, but overwrite is enabled! Overwriting file!"
-                                .format(save_file))
-                po.save(join(path, lang, json_root_key.value + ".po"))
-            else:
-                logging.error("File \"{}\" already exists! Will not saving!"
-                              .format(save_file))
+            # File already exists, let's try to update it
+            logging.info("Updating \"{}\"...".format(save_file))
+            po = pofile(save_file)
+            pot = self.generate_pot(json_root_key)
+            po.merge(pot)
+            po.save(save_file)
+        else:
+            # File does not exists, create it from JSON data
+            logging.info("Creating \"{}\"...".format(save_file))
+            po = POFile(check_for_duplicates=True)
+            po.metadata = METADATA_ENTRY
+
+            for entry in self.json_content[json_root_key.value]:
+                if entry[RcgLanguages.LANG_ENGLISH.value["key"]] != "":
+                    po_entry = POEntry(
+                        msgctxt=entry[RcgLanguages.LANG_KEY.value["key"]],
+                        msgid=entry[RcgLanguages.LANG_ENGLISH.value["key"]],
+                    )
+                    if language.value["key"] in entry and entry[language.value["key"]] is not None:
+                        po_entry.msgstr = entry[language.value["key"]]
+                    po_entry.flags.append("fuzzy")
+                    try:
+                        po.append(po_entry)
+                    except ValueError:
+                        logging.warning("Entry {} already exists, skipping...".
+                                        format(entry[RcgLanguages.LANG_KEY.value["key"]]))
+
+            po.save(save_file)
 
         return
