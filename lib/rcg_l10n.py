@@ -176,17 +176,17 @@ class RcgTranslation:
             for entry in self.json_content[json_root_key.value]:
                 if entry[RcgLanguages.LANG_ENGLISH.value["key"]] != "":
                     po_entry = POEntry(
-                        msgctxt=entry[RcgLanguages.LANG_KEY.value["key"]],
+                        msgctxt=entry[LANG_KEY],
                         msgid=entry[RcgLanguages.LANG_ENGLISH.value["key"]],
                     )
                     if language.value["key"] in entry and entry[language.value["key"]] is not None:
                         po_entry.msgstr = entry[language.value["key"]]
-                    po_entry.flags.append("fuzzy")
+                        po_entry.flags.append("fuzzy")
                     try:
                         po.append(po_entry)
                     except ValueError:
-                        logging.warning("Entry {} already exists, skipping...".
-                                        format(entry[RcgLanguages.LANG_KEY.value["key"]]))
+                        logging.debug("Entry {} already exists, skipping...".
+                                      format(entry[LANG_KEY]))
 
             po.save(save_file)
 
