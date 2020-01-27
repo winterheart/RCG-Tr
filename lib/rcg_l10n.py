@@ -41,6 +41,19 @@ class RcgLanguages(Enum):
     LANG_RUSSIAN = {"key": "Russian", "iso_code": "ru"}
 
 
+metadata_entry = {
+    'Project-Id-Version': '1.0',
+    'Report-Msgid-Bugs-To': 'you@example.com',
+    'POT-Creation-Date': datetime.now().isoformat(" "),
+    'PO-Revision-Date': datetime.now().isoformat(" "),
+    'Last-Translator': 'you <you@example.com>',
+    'Language-Team': '',
+    'MIME-Version': '1.0',
+    'Content-Type': 'text/plain; charset=UTF-8',
+    'Content-Transfer-Encoding': '8bit',
+}
+
+
 class RcgTranslation:
     def __init__(self, json_path):
         """
@@ -60,25 +73,14 @@ class RcgTranslation:
             json.dump(self.json_content, write_file, ensure_ascii=False, indent=2)
         return
 
-    def save_pot(self, path, json_root_key):
+    def generate_pot(self, json_root_key):
         """
-        Save Gettext POT file from JSON root key into path
-        :param path: Directory path save to
+        Generate and return POT file object
         :param json_root_key: JSON key from RcgJsonKeys class
-        :return:
+        :return: POT file object
         """
         pot = POFile(check_for_duplicates=True)
-        pot.metadata = {
-            'Project-Id-Version': '1.0',
-            'Report-Msgid-Bugs-To': 'you@example.com',
-            'POT-Creation-Date': datetime.now().isoformat(" "),
-            'PO-Revision-Date': datetime.now().isoformat(" "),
-            'Last-Translator': 'you <you@example.com>',
-            'Language-Team': '',
-            'MIME-Version': '1.0',
-            'Content-Type': 'text/plain; charset=utf-8',
-            'Content-Transfer-Encoding': '8bit',
-        }
+        pot.metadata = metadata_entry
         pot.metadata_is_fuzzy = 1
 
         for entry in self.json_content[json_root_key.value]:
@@ -93,6 +95,16 @@ class RcgTranslation:
                     logging.warning("Entry {} already exists, skipping...".
                                     format(entry[RcgLanguages.LANG_KEY.value["key"]]))
 
+        return pot
+
+    def save_pot(self, path, json_root_key):
+        """
+        Save Gettext POT file from JSON root key into path
+        :param path: Directory path save to
+        :param json_root_key: JSON key from RcgJsonKeys class
+        :return:
+        """
+        pot = self.generate_pot(json_root_key)
         if not exists(path):
             makedirs(path)
         pot.save(join(path, json_root_key.value + ".pot"))
@@ -147,17 +159,7 @@ class RcgTranslation:
         :return:
         """
         po = POFile()
-        po.metadata = {
-            'Project-Id-Version': '1.0',
-            'Report-Msgid-Bugs-To': 'you@example.com',
-            'POT-Creation-Date': datetime.now().isoformat(" "),
-            'PO-Revision-Date': datetime.now().isoformat(" "),
-            'Last-Translator': 'you <you@example.com>',
-            'Language-Team': '',
-            'MIME-Version': '1.0',
-            'Content-Type': 'text/plain; charset=utf-8',
-            'Content-Transfer-Encoding': '8bit',
-        }
+        po.metadata = metadata_entry
 
         language = next(name for name in RcgLanguages if name.value["iso_code"] == lang)
 
@@ -186,4 +188,3 @@ class RcgTranslation:
                               .format(save_file))
 
         return
-
