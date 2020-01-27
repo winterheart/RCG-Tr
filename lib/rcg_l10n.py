@@ -79,6 +79,7 @@ class RcgTranslation:
             'Content-Type': 'text/plain; charset=utf-8',
             'Content-Transfer-Encoding': '8bit',
         }
+        pot.metadata_is_fuzzy = 1
 
         for entry in self.json_content[json_root_key.value]:
             if entry[RcgLanguages.LANG_ENGLISH.value["key"]] != "":
