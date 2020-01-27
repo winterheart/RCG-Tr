@@ -42,24 +42,13 @@ class RcgLanguages(Enum):
 
 
 class RcgTranslation:
-    def __init__(self):
-        """Init class for handling RCG_LocalizationData.json"""
-        self.json_content = OrderedDict([])
-        for item in RcgJsonKeys:
-            self.json_content.update(
-                {item.value: []}
-            )
-
-    def load_json(self, json_path):
+    def __init__(self, json_path):
         """
-        Load from json file
-        :param json_path: path to JSON file
-        :return:
+        Init class for handling RCG_LocalizationData.json
+        :param json_path: Path to JSON file (UTF-8 with BOM)
         """
-
         with open(json_path, "r", encoding="utf-8-sig") as read_file:
             self.json_content = json.load(read_file)
-        return
 
     def save_json(self, json_path):
         """

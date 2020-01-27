@@ -5,16 +5,14 @@
 import json
 from lib.rcg_l10n import RcgJsonKeys, RcgLanguages, RcgTranslation
 
-rcg_file = RcgTranslation()
-rcg_file.load_json("data/RCG_LocalizationData.json")
-rcg_file.load_po("translation", RcgJsonKeys.NON_DIALOG_KEYS, RcgLanguages.LANG_RUSSIAN.value["iso_code"])
-rcg_file.save_json("data/translation.json")
+#rcg_file = RcgTranslation()
+#rcg_file.load_json("data/RCG_LocalizationData.json")
+#rcg_file.load_po("translation", RcgJsonKeys.NON_DIALOG_KEYS, RcgLanguages.LANG_RUSSIAN.value["iso_code"])
+#rcg_file.save_json("data/translation.json")
 
-#for item in RcgJsonKeys:
-#    rcg_file.save_pot("translation", item)
+rcg_file = RcgTranslation("data/RCG_LocalizationData.json")
+for item in RcgJsonKeys:
+    rcg_file.save_pot("translation", item)
 
 #for item in RcgJsonKeys:
 #    rcg_file.save_po("translation", item, "ru")
-
-# print(RcgJsonKeys.TUTORIAL_KEYS.value)
-# print(RcgLanguages.LANG_ENGLISH.value["iso_code"])
