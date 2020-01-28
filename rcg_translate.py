@@ -41,6 +41,7 @@ Copyright:
 import logging
 from docopt import docopt
 from lib.rcg_l10n import RcgJsonKeys, RcgLanguages, RcgTranslation
+from os.path import exists
 
 version = "RCG Translate 0.5"
 
@@ -51,6 +52,10 @@ if __name__ == "__main__":
     logging.basicConfig(format='%(asctime)-15s %(levelname)-8s %(name)s: %(message)s')
     if args["--verbose"]:
         logger.setLevel(logging.INFO)
+
+    if not exists(args["--input"]):
+        logger.error("'{}' does not exist! Please specify correct path.".format(args["--input"]))
+        exit(-2)
 
     languages = []
     # Validate languages

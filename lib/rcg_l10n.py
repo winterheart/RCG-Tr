@@ -8,7 +8,7 @@ from itertools import zip_longest
 import logging
 from os import makedirs
 from os.path import join, exists
-from polib import POEntry, POFile, pofile, unescape
+from polib import POEntry, POFile, pofile
 from simplejson import OrderedDict
 import simplejson as json
 
@@ -93,8 +93,7 @@ class RcgTranslation:
                 try:
                     pot.append(po_entry)
                 except ValueError:
-                    logging.debug("Entry {} already exists, skipping...".
-                                  format(entry[LANG_KEY]))
+                    logging.debug("Entry {} already exists, skipping...".format(entry[LANG_KEY]))
 
         return pot
 
@@ -122,7 +121,7 @@ class RcgTranslation:
         """
 
         if len(self.json_content[json_root_key.value]) == 0:
-            logging.error("ERROR: {} JSON entry is empty! Forgot ot load_json()?".format(json_root_key.value))
+            logging.error("ERROR: {} JSON entry is empty! Forgot to load_json()?".format(json_root_key.value))
             return
 
         temp_json = OrderedDict([])
@@ -162,14 +161,14 @@ class RcgTranslation:
             makedirs(save_path)
         if exists(save_file):
             # File already exists, let's try to update it
-            logging.info("Updating \"{}\"...".format(save_file))
+            logging.info("Updating '{}'...".format(save_file))
             po = pofile(save_file)
             pot = self.generate_pot(json_root_key)
             po.merge(pot)
             po.save(save_file)
         else:
             # File does not exists, create it from JSON data
-            logging.info("Creating \"{}\"...".format(save_file))
+            logging.info("Creating '{}'...".format(save_file))
             po = POFile(check_for_duplicates=True)
             po.metadata = METADATA_ENTRY
 
@@ -185,8 +184,7 @@ class RcgTranslation:
                     try:
                         po.append(po_entry)
                     except ValueError:
-                        logging.debug("Entry {} already exists, skipping...".
-                                      format(entry[LANG_KEY]))
+                        logging.debug("Entry {} already exists, skipping...".format(entry[LANG_KEY]))
 
             po.save(save_file)
 
