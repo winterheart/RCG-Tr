@@ -62,6 +62,9 @@ class RcgTranslation:
         """
         with open(json_path, "r", encoding="utf-8-sig") as read_file:
             self.json_content = json.load(read_file)
+            # Make entries unique
+            for key in RcgJsonKeys:
+                self.json_content[key.value] = list({v[LANG_KEY]: v for v in self.json_content[key.value]}.values())
 
     def save_json(self, json_path):
         """
