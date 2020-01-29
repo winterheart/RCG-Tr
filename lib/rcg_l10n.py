@@ -4,7 +4,6 @@
 
 from datetime import datetime
 from enum import Enum
-from itertools import zip_longest
 import logging
 from os import makedirs
 from os.path import join, exists
@@ -127,20 +126,23 @@ class RcgTranslation:
         temp_json = OrderedDict([])
         temp_json.update({json_root_key.value: []})
 
-        language = next(name for name in RcgLanguages if name.value["iso_code"] == lang)
+        language = next(name.value["key"] for name in RcgLanguages if name.value["iso_code"] == lang)
 
-        po = pofile(join(path, lang, json_root_key.value + ".po"))
-        valid_entries = [e for e in po if not e.obsolete and e.translated() and "fuzzy" not in e.flags]
+        po_file = join(path, lang, json_root_key.value + ".po")
 
-        for entry in valid_entries:
-            temp_json[json_root_key.value].append({
-                LANG_KEY: entry.msgctxt,
-                language.value["key"]: entry.msgstr
-            })
+        if exists(po_file):
+            po = pofile(po_file)
 
-        # I wish if I know what is going on here...
-        self.json_content[json_root_key.value] = [{**u, **v} for u, v in zip_longest(
-            self.json_content[json_root_key.value], temp_json[json_root_key.value], fillvalue={})]
+            for entry in po:
+                json_entry = next(
+                    item for item in self.json_content[json_root_key.value] if item[LANG_KEY] == entry.msgctxt)
+                if not entry.obsolete and entry.translated() and "fuzzy" not in entry.flags:
+                    json_entry[language] = entry.msgstr
+                # else:
+                    # FIXME Don't overwrite?
+                    # json_entry[language] = entry.msgid
+        else:
+            logging.warning("ERROR: '{}' is not exists! Skipping.".format(po_file))
 
         return
 
