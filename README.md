@@ -107,3 +107,12 @@ Each message in PO file can be in one of four states: obsoleted,
 untranslated, translated and fuzzy. RCG-Tr uses only translated entries
 during packing. If entry in non-translated state, original message will
 be used (or English if there no such entry in original JSON).
+
+## License
+
+Copyright (c) 2020 Azamat H. Hackimov <azamat.hackimov@gmail.com>
+
+License GPLv3+: GNU GPL version 3 or later <https://gnu.org/licenses/gpl.html>
+
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.
