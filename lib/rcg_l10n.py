@@ -141,9 +141,10 @@ class RcgTranslation:
                     item for item in self.json_content[json_root_key.value] if item[LANG_KEY] == entry.msgctxt)
                 if not entry.obsolete and entry.translated() and "fuzzy" not in entry.flags:
                     json_entry[language] = entry.msgstr
-                # else:
-                    # FIXME Don't overwrite?
-                    # json_entry[language] = entry.msgid
+                else:
+                    # Add entry if there no entry at all
+                    if language not in json_entry:
+                        json_entry[language] = entry.msgid
         else:
             logging.warning("ERROR: '{}' is not exists! Skipping.".format(po_file))
 
