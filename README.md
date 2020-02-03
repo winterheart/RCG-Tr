@@ -1,7 +1,7 @@
 # RCG-Tr - River City Girls Translation tool
 
 RCG Translate (RCG-Tr) is open-source tool written in Python that helps
-to translate text from River City Girl game into various languages.
+to translate text from River City Girls game into various languages.
 
 ## Installation
 
@@ -18,23 +18,23 @@ You can install them via package manager of your system or pip:
 pip install -r requirements.txt
 ```
 
-## Structure of RCG_LocalizationData.json
+## Structure of `RCG_LocalizationData.json`
 
 `RCG_LocalizationData.json` is standard JSON file (UTF-8 with BOM,
 CRLF) that contains all text messages in 10 languages. These messages
 are grouped into 10 groups:
 
-* Dialog_Keys - dialogs and replies
-* Equip_Keys - info about weapons
-* MetaData_Keys - messages for Achievements and various descriptions for
+* `Dialog_Keys` - dialogs and replies
+* `Equip_Keys` - info about weapons
+* `MetaData_Keys` - messages for Achievements and various descriptions for
 Steam, Xbox, PS4, Switch stores
-* Move_Keys - names of attacks
-* Non_Dialog_Keys - strings for UI
-* Quest_Keys - main and side quests
-* QuestItem_Keys - descriptions for quest items
-* Store_Keys - names of in-game stores
-* Tutorial_Keys - messages for tutorial
-* Useables_Keys - names and descriptions for consumables and outfits
+* `Move_Keys` - names of attacks
+* `Non_Dialog_Keys` - strings for UI
+* `Quest_Keys` - main and side quests
+* `QuestItem_Keys` - descriptions for quest items
+* `Store_Keys` - names of in-game stores
+* `Tutorial_Keys` - messages for tutorial
+* `Useables_Keys` - names and descriptions for consumables and outfits
 
 Each group is list of dictionaries that contains `Key` of message and
 translated strings. Here example of that dict:
@@ -116,3 +116,4 @@ License GPLv3+: GNU GPL version 3 or later <https://gnu.org/licenses/gpl.html>
 
 This is free software: you are free to change and redistribute it.
 There is NO WARRANTY, to the extent permitted by law.
+
