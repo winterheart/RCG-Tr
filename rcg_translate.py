@@ -43,7 +43,7 @@ from docopt import docopt
 from lib.rcg_l10n import RcgJsonKeys, RcgLanguages, RcgTranslation
 from os.path import exists
 
-version = "RCG Translate 0.5"
+version = "RCG Translate 0.9.0"
 
 if __name__ == "__main__":
     args = docopt(__doc__, version=version)
